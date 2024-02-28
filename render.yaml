@@ -1,1 +1,58 @@
+services:
+  - name: postgres
+    plan: starter
+    env: []
+    envVars:
+      - key: POSTGRES_DB
+        value: nakama
+      - key: POSTGRES_PASSWORD
+        value: localdb
+    instanceCount: 1
+    containers:
+      - name: postgres
+        image: postgres:12.2-alpine
+        env: []
+        ports:
+          - 5432
+          - 8080
+        volumes:
+          - name: data
+            path: /var/lib/postgresql/data
+        healthCheck:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+
+  - name: nakama
+    plan: starter
+    env: []
+    instanceCount: 1
+    containers:
+      - name: nakama
+        image: registry.heroiclabs.com/heroiclabs/nakama:3.20.1
+        entrypoint:
+          - "/bin/sh"
+          - "-ecx"
+          - "/nakama/nakama migrate up --database.address postgres:localdb@postgres:5432/nakama && exec /nakama/nakama --name nakama1 --database.address postgres:localdb@postgres:5432/nakama --socket.server_key nakama_godot_demo --logger.level DEBUG --session.token_expiry_sec 7200"
+        env: []
+        ports:
+          - 7349
+          - 7350
+          - 7351
+        volumes:
+          - name: data
+            path: /nakama/data
+        healthCheck:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+volumes:
+  - name: data
+    plan: starter
 
