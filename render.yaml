@@ -17,6 +17,7 @@ services:
           - 8080
         volumes:
           - name: data
+            type: volume
             path: /var/lib/postgresql/data
         healthCheck:
           httpGet:
@@ -44,6 +45,7 @@ services:
           - 7351
         volumes:
           - name: data
+            type: volume
             path: /nakama/data
         healthCheck:
           httpGet:
@@ -55,4 +57,4 @@ services:
 volumes:
   - name: data
     plan: starter
-
+    type: volume
